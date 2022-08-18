@@ -15,6 +15,7 @@ module.exports = defineConfig(({ mode }) => {
       emptyOutDir: true,
       sourcemap: true,
       lib: {
+        name: 'fetchin',
         entry: resolve(__dirname, "src/index.ts"),
         formats: ["es", "cjs", "iife"],
         fileName: (format) => `index${format === 'es' ? '.mjs' : '.cjs'}`
