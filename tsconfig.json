@@ -1,0 +1,10 @@
+{
+  "extends": "@ombro/ts-config/tsconfig.esm.json",
+  "compilerOptions": {
+    "composite": true,
+    "removeComments": false,
+    "types": ["vite/client", "node", "vitest"]
+  },
+  "include": ["src"],
+  "exclude": ["**/*.test.ts", "node_modules", "test/**", ".history/**"]
+}

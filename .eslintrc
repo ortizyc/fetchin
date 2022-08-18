@@ -1,0 +1,7 @@
+{
+  "extends": ["@ombro/eslint-config-typescript"],
+  "env": {
+    "browser": true,
+    "node": true
+  }
+}

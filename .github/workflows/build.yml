@@ -1,0 +1,32 @@
+name: Fetchin build CI
+
+on: 
+  push:
+    branches:
+      - main
+      - develop
+
+  pull_request: 
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 7.6.0
+      
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run ESLint
+        run: pnpm lint
+      
+      - name: Run compile and build packages
+        run: pnpm build
