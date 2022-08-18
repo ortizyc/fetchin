@@ -1,15 +1,7 @@
 name: Fetchin build CI
 
 on: 
-  push:
-    branches:
-      - main
-      - develop
-
-  pull_request: 
-    branches:
-      - main
-      - develop
+  push
 
 jobs:
   build:
