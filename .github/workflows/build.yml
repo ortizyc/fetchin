@@ -29,7 +29,7 @@ jobs:
       
       - name: secrets
         env: 
-          SSECRET: ${{ secrets.sSecret }}
+          SSECRET: ${{ secrets.SSECRET }}
         run: echo "$env:SSECRET"
 
       - name: Install dependencies
