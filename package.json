@@ -23,7 +23,7 @@
     "build": "tsc && vite build",
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "lint:scripts": "eslint . --ext .ts",
+    "lint": "eslint . --ext .ts",
     "format": "prettier . --write",
     "prepare": "husky install && husky add .husky/pre-commit 'npx lint-staged' && git add .husky/pre-commit"
   },
