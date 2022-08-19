@@ -2,21 +2,17 @@ name: Fetchin build CI
 
 on: 
   push:
-    branches:
-      - main
-      - develop
-
+    branches: [ release ]
   pull_request: 
-    branches:
-      - main
-      - develop
+    branches: [ release ]
 
 jobs:
-  build:
+  publish-to-npm:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout release branch code
+        uses: actions/checkout@v3
 
       - uses: pnpm/action-setup@v2.0.1
         with:
@@ -27,16 +23,7 @@ jobs:
           node-version: 16
           cache: 'pnpm'
       
-      - name: secrets
+      - name: Publish to NPM
+        run: pnpm publish
         env: 
-          SSECRET: ${{ secrets.SSECRET }}
-        run: echo "$env:SSECRET"
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run ESLint
-        run: pnpm lint
-      
-      - name: Run compile and build packages
-        run: pnpm build
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

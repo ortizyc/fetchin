@@ -13,7 +13,7 @@ module.exports = defineConfig(({ mode }) => {
     build: {
       outDir: resolve(__dirname, 'dist'),
       emptyOutDir: true,
-      sourcemap: true,
+      sourcemap: false,
       lib: {
         name: 'fetchin',
         entry: resolve(__dirname, "src/index.ts"),
