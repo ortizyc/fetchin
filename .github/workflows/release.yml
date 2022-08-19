@@ -17,8 +17,7 @@ jobs:
           node-version: 16
           cache: 'pnpm'
 
-      - run: npm build
-
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.sSecret }}
+      - name: Publish to NPM
+        run: pnpm publish
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
