@@ -7,6 +7,7 @@ import { build as _build } from 'vite'
 import dts from 'vite-plugin-dts'
 
 import { removeDir } from './utils'
+import { InlineConfig } from 'vite'
 
 export type BuildMode = 'development' | 'production'
 export type BuildArgs = ParsedArgs & {
@@ -29,78 +30,43 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 
   // build
   if (args.mode === 'development') {
-    await buildMain(args.mode, args.watch)
+    await buildMain(args)
   } else {
-    // check types in production mode
+    // check types in production mode build before
     checkTypes()
-    // 不能并行编译 main 和 locale，在类型合并前存在重复名称的类型声明输出文件，会导致出错
-    await buildMain(args.mode, args.watch)
-    await buildLocale(args.mode)
+    // Cannot compile main and locale in parallel,
+    // there is a type declaration output file with duplicate name before type merging,
+    // which will cause an error
+    await buildMain(args)
+    await buildLocale(args)
   }
   console.log('Build successful!')
 }
 
 // build main package
-export async function buildMain(mode: BuildMode, watch: boolean) {
-  const isProd = mode === 'production'
-  await _build({
-    root: ROOT_DIR,
-    define: {
-      __DEV__: isProd,
-    },
-    build: {
-      watch: watch ? {} : null,
+export async function buildMain(args: BuildArgs) {
+  const buildConfig = genBuildConfig(
+    {
+      name: 'fetchin',
+      entry: resolve(ROOT_DIR, 'src/index.ts'),
       outDir: resolve(ROOT_DIR, 'dist'),
-      sourcemap: false,
-      lib: {
-        name: 'fetchin',
-        entry: resolve(ROOT_DIR, 'src/index.ts'),
-        formats: ['es', 'cjs'],
-        fileName: (format) => `index${format === 'es' ? '.js' : '.cjs'}`,
-      },
     },
-    plugins: [
-      dts({
-        rollupTypes: isProd,
-        insertTypesEntry: true,
-        copyDtsFiles: false,
-        beforeWriteFile: (filePath, content) => {
-          return { filePath, content }
-        },
-      }),
-    ],
-  })
+    args,
+  )
+  await _build(buildConfig)
 }
 
 // build locale sub package
-export async function buildLocale(mode: BuildMode) {
-  const isProd = mode === 'production'
-  await _build({
-    root: ROOT_DIR,
-    define: {
-      __DEV__: isProd,
-    },
-    build: {
+export async function buildLocale(args: BuildArgs) {
+  const buildConfig = genBuildConfig(
+    {
+      name: 'fetchinLocale',
+      entry: resolve(ROOT_DIR, 'src/locale/index.ts'),
       outDir: resolve(ROOT_DIR, 'dist/locale'),
-      sourcemap: false,
-      lib: {
-        name: 'fetchinLocale',
-        entry: resolve(ROOT_DIR, 'src/locale/index.ts'),
-        formats: ['es', 'cjs'],
-        fileName: (format) => `index${format === 'es' ? '.js' : '.cjs'}`,
-      },
     },
-    plugins: [
-      dts({
-        rollupTypes: isProd,
-        insertTypesEntry: true,
-        copyDtsFiles: false,
-        beforeWriteFile: (filePath, content) => {
-          return { filePath, content }
-        },
-      }),
-    ],
-  })
+    args,
+  )
+  await _build(buildConfig)
 }
 
 /**
@@ -109,4 +75,41 @@ export async function buildLocale(mode: BuildMode) {
  */
 export function checkTypes() {
   execa.commandSync('tsc --noEmit', { stdio: 'inherit' })
+}
+
+type GenBuildConfigOptions = {
+  name: string
+  entry: string
+  outDir: string
+}
+
+function genBuildConfig(options: GenBuildConfigOptions, args: BuildArgs): InlineConfig {
+  const { name, entry, outDir } = options
+  const { mode, watch } = args
+  const isProd = mode === 'production'
+  return {
+    root: ROOT_DIR,
+    define: {
+      __DEV__: isProd,
+    },
+    build: {
+      outDir: outDir,
+      watch: watch ? {} : null,
+      sourcemap: false,
+      lib: {
+        name,
+        entry,
+        formats: ['es', 'cjs'],
+        fileName: (format) => `index${format === 'es' ? '.js' : '.cjs'}`,
+      },
+    },
+    plugins: [
+      dts({
+        rollupTypes: isProd,
+        insertTypesEntry: true,
+        copyDtsFiles: false,
+        beforeWriteFile: (filePath, content) => ({ filePath, content }),
+      }),
+    ],
+  }
 }
