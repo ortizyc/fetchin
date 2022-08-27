@@ -34,6 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
     "@vitest/coverage-c8": "^0.22.1",
+    "axios": "^0.27.2",
     "eslint": "^8.11.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.7",
