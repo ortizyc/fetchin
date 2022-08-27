@@ -19,13 +19,13 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm -y",
+    "prepare": "husky install",
     "dev": "vite --host",
     "build": "tsc && vite build",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "lint": "eslint . --ext .ts",
-    "format": "prettier . --write",
-    "prepare": "husky install && husky add .husky/pre-commit 'npx lint-staged' && git add .husky/pre-commit"
+    "format": "prettier . --write"
   },
   "devDependencies": {
     "@ombro/eslint-config-typescript": "^0.1.0",
