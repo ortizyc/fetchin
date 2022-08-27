@@ -1,5 +1,5 @@
 {
-  ".ts": [
+  "*.ts": [
     "eslint",
     "prettier --write --parser typescript"
   ]
