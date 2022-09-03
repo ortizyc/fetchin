@@ -34,14 +34,6 @@
     "lint": "eslint . --ext .ts",
     "format": "prettier . --write"
   },
-  "peerDependencies": {
-    "axios": "^0.27.2"
-  },
-  "peerDependenciesMeta": {
-    "axios": {
-      "optional": true
-    }
-  },
   "devDependencies": {
     "@ombro/eslint-config-typescript": "^0.1.0",
     "@ombro/ts-config": "^1.4.2",
@@ -50,7 +42,6 @@
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
     "@vitest/coverage-c8": "^0.22.1",
-    "axios": "^0.27.2",
     "eslint": "^8.11.0",
     "execa": "^5.1.1",
     "husky": "^7.0.4",
@@ -62,5 +53,8 @@
     "vite": "^2.8.0",
     "vite-plugin-dts": "^1.4.1",
     "vitest": "^0.22.1"
+  },
+  "dependencies": {
+    "axios": "^0.27.2"
   }
 }
