@@ -38,7 +38,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     // there is a type declaration output file with duplicate name before type merging,
     // which will cause an error
     await buildMain(args)
-    await buildLocale(args)
+    // await buildLocale(args)
   }
   console.log('Build successful!')
 }
@@ -101,6 +101,9 @@ function genBuildConfig(options: GenBuildConfigOptions, args: BuildArgs): Inline
         entry,
         formats: ['es', 'cjs'],
         fileName: (format) => `index${format === 'es' ? '.js' : '.cjs'}`,
+      },
+      rollupOptions: {
+        external: ['axios'],
       },
     },
     plugins: [

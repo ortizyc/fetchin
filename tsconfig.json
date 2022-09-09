@@ -1,5 +1,5 @@
 {
-  "extends": "@ombro/ts-config/tsconfig.esm.json",
+  "extends": "@ombro/tsconfig",
   "compilerOptions": {
     "baseUrl": ".",
     "composite": true,
