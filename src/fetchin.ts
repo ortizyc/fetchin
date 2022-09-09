@@ -1,9 +1,9 @@
 import merge from 'lodash.merge'
-import axios, { AxiosInstance, type AxiosResponse } from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
+import type { FetchinConfig, FetchinResponse } from './types'
 import { responseTransformers } from './transformer/response'
 import { requestTransformers } from './transformer/request'
-import type { FetchinConfig } from './types'
 import { bearerAuthInterceptor, useRequestInterceptor } from './interceptor/request'
 import { useResponseInterceptor } from './interceptor/response'
 
@@ -50,14 +50,17 @@ export class Fetchin {
   /**
    * get request
    */
-  get<T = any, R = AxiosResponse<T>, D = any>(url: string, config?: FetchinConfig<D>): Promise<R> {
+  get<T = any, R = FetchinResponse<T>, D = any>(
+    url: string,
+    config?: FetchinConfig<D>,
+  ): Promise<R> {
     return this.axiosInstance.get(url, config)
   }
 
   /**
    * post request
    */
-  post<T = any, R = AxiosResponse<T>, D = any>(
+  post<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
     config?: FetchinConfig<D>,
@@ -68,7 +71,7 @@ export class Fetchin {
   /**
    * put request
    */
-  put<T = any, R = AxiosResponse<T>, D = any>(
+  put<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
     config?: FetchinConfig<D>,
@@ -79,7 +82,7 @@ export class Fetchin {
   /**
    * delete request
    */
-  delete<T = any, R = AxiosResponse<T>, D = any>(
+  delete<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     config?: FetchinConfig<D>,
   ): Promise<R> {
@@ -89,7 +92,7 @@ export class Fetchin {
   /**
    * post form request
    */
-  postForm<T = any, R = AxiosResponse<T>, D = any>(
+  postForm<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
     config?: FetchinConfig<D>,
@@ -100,7 +103,7 @@ export class Fetchin {
   /**
    * put form request
    */
-  putForm<T = any, R = AxiosResponse<T>, D = any>(
+  putForm<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
     config?: FetchinConfig<D>,
@@ -108,7 +111,7 @@ export class Fetchin {
     return this.axiosInstance.putForm(url, data, config)
   }
 
-  request<T = any, R = AxiosResponse<T>, D = any>(config: FetchinConfig<D>): Promise<R> {
+  request<T = any, R = FetchinResponse<T>, D = any>(config: FetchinConfig<D>): Promise<R> {
     return this.axiosInstance.request(config)
   }
 
