@@ -7,12 +7,13 @@ import { requestTransformers } from './transformer/request'
 import { bearerAuthInterceptor, useRequestInterceptor } from './interceptor/request'
 import { useResponseInterceptor } from './interceptor/response'
 
-const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG: FetchinConfig = {
   transformRequest: requestTransformers,
   transformResponse: responseTransformers,
   requestInterceptors: [{ onFulfilled: bearerAuthInterceptor }],
   responseInterceptors: [],
 }
+
 export class Fetchin {
   private axiosInstance!: AxiosInstance
   private config: FetchinConfig
