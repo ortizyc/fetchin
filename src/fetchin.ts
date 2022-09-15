@@ -1,7 +1,13 @@
 import merge from 'lodash.merge'
 import axios, { AxiosInstance } from 'axios'
 
-import type { FetchinConfig, FetchinResponse } from './types'
+import type {
+  FetchinConfig,
+  FetchinInterceptor,
+  FetchinRequestInterceptorFulfilled,
+  FetchinResponse,
+  FetchinResponseInterceptorFulfilled,
+} from './types'
 import { responseTransformers } from './transformer/response'
 import { requestTransformers } from './transformer/request'
 import { bearerAuthInterceptor, useRequestInterceptor } from './interceptor/request'
@@ -38,14 +44,6 @@ export class Fetchin {
         useResponseInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
       })
     }
-  }
-
-  /**
-   * update config, will recreate instance
-   */
-  updateConfig(config: FetchinConfig) {
-    this.config = merge(this.config, config)
-    this.createInstance()
   }
 
   /**
@@ -121,5 +119,21 @@ export class Fetchin {
    */
   getUri(config?: FetchinConfig): string {
     return this.axiosInstance.getUri(config)
+  }
+
+  /**
+   * add request interceptor
+   */
+  useRequestInterceptor(interceptor: FetchinInterceptor<FetchinRequestInterceptorFulfilled>) {
+    const { onFulfilled, onRejected, options } = interceptor
+    return useRequestInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
+  }
+
+  /**
+   * add response interceptor
+   */
+  useResponseInterceptor(interceptor: FetchinInterceptor<FetchinResponseInterceptorFulfilled>) {
+    const { onFulfilled, onRejected, options } = interceptor
+    return useResponseInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
   }
 }
