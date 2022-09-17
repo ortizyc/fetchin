@@ -39,3 +39,9 @@ export type FetchinInterceptor<
   onRejected?: FetchinInterceptorRejected
   options?: FetchinInterceptorOptions
 }
+
+export interface ResponseBodyEntity<T = any> {
+  code: number | string
+  data: T
+  message: string
+}
