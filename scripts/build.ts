@@ -103,7 +103,7 @@ function genBuildConfig(options: GenBuildConfigOptions, args: BuildArgs): Inline
         fileName: (format) => `index${format === 'es' ? '.js' : '.cjs'}`,
       },
       rollupOptions: {
-        external: ['axios'],
+        // external: ['axios'],
       },
     },
     plugins: [

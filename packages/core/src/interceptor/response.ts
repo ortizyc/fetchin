@@ -8,7 +8,6 @@ import type {
 } from '../types'
 
 import { LocaleManager } from '../locale'
-import { HttpStatus } from '../http-status'
 
 const localeManager = new LocaleManager()
 

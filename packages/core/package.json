@@ -1,0 +1,33 @@
+{
+  "name": "@ortizyc/fetchin-core",
+  "description": "fetchin core",
+  "version": "0.0.1",
+  "author": "ortizyc <recuritis@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "module": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "scripts": {
+    "dev": "vite build --mode=development --watch",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@types/lodash.merge": "^4.6.7",
+    "axios": "^0.27.2",
+    "lodash.merge": "^4.6.2"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
