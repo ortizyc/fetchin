@@ -33,14 +33,14 @@ export const dataResponseInterceptor: FetchinResponseInterceptorFulfilled = (
     config: { meta },
   } = response
 
-  if (data == null || validateResponseDataStructure(data)) {
+  if (data == null || !validateResponseDataStructure(data)) {
     throw new Error(
       '[Fetchin dataResponseInterceptor Error]: Unavailable data type, please check the response body structure and transform data',
     )
   }
 
-  response.data.message = data.message ?? meta.localeManager.$t(status)
-
+  // if message is '' or null, use default message
+  response.data.message = data.message || meta.localeManager.$t(status.toString())
   return response
 }
 

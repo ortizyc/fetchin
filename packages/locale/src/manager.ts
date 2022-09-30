@@ -31,6 +31,11 @@ export class LocaleManager {
 
   private _init(locales: Locale[] = []) {
     /**
+     * set default locale
+     */
+    this._map.set(DEFAULT_LOCALE.name, DEFAULT_LOCALE)
+
+    /**
      * set user locales
      */
     locales.forEach((locale) => {

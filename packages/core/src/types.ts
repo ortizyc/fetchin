@@ -11,7 +11,7 @@ export type FetchExtraConfig = {
    * interceptors
    */
   requestInterceptors?: FetchinInterceptor<FetchinRequestInterceptorFulfilled>[]
-  responseInterceptors?: FetchinInterceptor<FetchinInterceptorRejected>[]
+  responseInterceptors?: FetchinInterceptor<FetchinResponseInterceptorFulfilled>[]
 
   /**
    * locale config

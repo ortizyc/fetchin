@@ -1,6 +1,7 @@
 import merge from 'lodash.merge'
 import axios, { AxiosInstance } from 'axios'
 
+import { LocaleManager } from '@ortizyc/fetchin-locale'
 import type {
   FetchinConfig,
   FetchinInterceptor,
@@ -12,14 +13,13 @@ import type {
 import { responseTransformers } from './transformer/response'
 import { requestTransformers } from './transformer/request'
 import { bearerAuthInterceptor, useRequestInterceptor } from './interceptor/request'
-import { useResponseInterceptor } from './interceptor/response'
-import { LocaleManager } from '@ortizyc/fetchin-locale'
+import { dataResponseInterceptor, useResponseInterceptor } from './interceptor/response'
 
 const DEFAULT_CONFIG: FetchinConfig = {
   transformRequest: requestTransformers,
   transformResponse: responseTransformers,
   requestInterceptors: [{ onFulfilled: bearerAuthInterceptor }],
-  responseInterceptors: [],
+  responseInterceptors: [{ onFulfilled: dataResponseInterceptor }],
 }
 
 export class Fetchin {

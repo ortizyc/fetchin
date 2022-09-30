@@ -17,6 +17,8 @@
     "prepare": "husky install",
     "dev": "pnpm -F !playground-* -r --parallel dev",
     "build": "pnpm -F !playground-* -r build",
+    "pg:client": "pnpm -C playgrounds/client dev",
+    "pg:server": "pnpm -C playgrounds/server dev",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "lint": "eslint . --ext .ts",
