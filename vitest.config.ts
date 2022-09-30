@@ -5,7 +5,7 @@ export default defineConfig({
     environment: 'node',
     include: ['packages/**/*.{spec,test}.ts'],
     coverage: {
-      include: ['packages/**/*.ts', '!packages/locale'],
+      include: ['packages/**/*.ts'],
       reporter: ['text', 'lcov'],
       statements: 90,
     },

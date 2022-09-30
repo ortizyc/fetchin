@@ -57,8 +57,10 @@ importers:
   packages/fetchin:
     specifiers:
       '@ortizyc/fetchin-core': workspace:*
+      '@ortizyc/fetchin-locale': workspace:^0.0.1
     dependencies:
       '@ortizyc/fetchin-core': link:../core
+      '@ortizyc/fetchin-locale': link:../locale
 
 packages:
 

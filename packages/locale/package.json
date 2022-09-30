@@ -1,6 +1,6 @@
 {
-  "name": "@ortizyc/fetchin",
-  "description": "fetchin",
+  "name": "@ortizyc/fetchin-locale",
+  "description": "fetchin locale",
   "version": "0.0.1",
   "author": "ortizyc <recuritis@gmail.com>",
   "license": "MIT",
@@ -18,10 +18,6 @@
   "scripts": {
     "dev": "vite build --mode=development --watch",
     "build": "vite build"
-  },
-  "dependencies": {
-    "@ortizyc/fetchin-core": "workspace:*",
-    "@ortizyc/fetchin-locale": "workspace:*"
   },
   "files": [
     "dist"
