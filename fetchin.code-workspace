@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "name": "✨ @ortizyc/fetchin-monorepo",
+      "path": "."
+    },
+    {
+      "name": "📦 @ortizyc/fetchin-core",
+      "path": "packages/core"
+    },
+    {
+      "name": "📦 @ortizyc/fetchin",
+      "path": "packages/fetchin"
+    },
+    {
+      "name": "📦 @ortizyc/fetchin-locale",
+      "path": "packages/locale"
+    }
+  ],
+  "settings": {}
+}
