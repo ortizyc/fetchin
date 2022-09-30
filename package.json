@@ -15,8 +15,8 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm -y",
     "prepare": "husky install",
-    "dev": "tsx scripts/build.ts --mode=development --watch",
-    "build": "tsx scripts/build.ts --mode=production",
+    "dev": "pnpm -F !playground-* -r --parallel dev",
+    "build": "pnpm -F !playground-* -r build",
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "lint": "eslint . --ext .ts",

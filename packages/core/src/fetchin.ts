@@ -4,6 +4,7 @@ import axios, { AxiosInstance } from 'axios'
 import type {
   FetchinConfig,
   FetchinInterceptor,
+  FetchinMeta,
   FetchinRequestInterceptorFulfilled,
   FetchinResponse,
   FetchinResponseInterceptorFulfilled,
@@ -12,6 +13,7 @@ import { responseTransformers } from './transformer/response'
 import { requestTransformers } from './transformer/request'
 import { bearerAuthInterceptor, useRequestInterceptor } from './interceptor/request'
 import { useResponseInterceptor } from './interceptor/response'
+import { LocaleManager } from '@ortizyc/fetchin-locale'
 
 const DEFAULT_CONFIG: FetchinConfig = {
   transformRequest: requestTransformers,
@@ -21,11 +23,19 @@ const DEFAULT_CONFIG: FetchinConfig = {
 }
 
 export class Fetchin {
+  private localeManager: LocaleManager
   private axiosInstance!: AxiosInstance
-  private config: FetchinConfig
+  private config: FetchinConfig<any, true>
 
-  constructor(config?: FetchinConfig) {
-    this.config = merge(DEFAULT_CONFIG, config)
+  constructor(config: FetchinConfig = {}) {
+    this.localeManager = new LocaleManager(config.locales)
+
+    const meta: FetchinMeta = {
+      localeManager: this.localeManager,
+    }
+    // merge config and inject meta
+    this.config = merge({}, DEFAULT_CONFIG, config, { meta }) as FetchinConfig<any, true>
+
     this.createInstance()
   }
 

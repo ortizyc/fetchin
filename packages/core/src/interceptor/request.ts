@@ -11,7 +11,7 @@ export function useRequestInterceptor(
   onRejected?: FetchinInterceptorRejected,
   options?: FetchinInterceptorOptions,
 ): number {
-  return axios.interceptors.request.use(onFulfilled, onRejected, options)
+  return axios.interceptors.request.use(onFulfilled as any, onRejected, options)
 }
 
 export function ejectRequestInterceptor(axios: AxiosInstance, id: number): void {

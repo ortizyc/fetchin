@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
         fileName: (format) => `index${format === 'es' ? '.js' : '.cjs'}`,
       },
       rollupOptions: {
-        // external: ['axios'],
+        external: ['@ortizyc/fetchin-locale'],
       },
     },
     plugins: [

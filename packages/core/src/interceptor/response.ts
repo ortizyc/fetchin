@@ -7,20 +7,13 @@ import type {
   ResponseBodyEntity,
 } from '../types'
 
-import { LocaleManager } from '../locale'
-
-const localeManager = new LocaleManager()
-
-const hasOwnProperty = (context: object, prop: string) =>
-  Object.prototype.hasOwnProperty.call(context, prop)
-
 export function useResponseInterceptor(
   axios: AxiosInstance,
   onFulfilled?: FetchinResponseInterceptorFulfilled,
   onRejected?: FetchinInterceptorRejected,
   options?: FetchinInterceptorOptions,
 ): number {
-  return axios.interceptors.response.use(onFulfilled, onRejected, options)
+  return axios.interceptors.response.use(onFulfilled as any, onRejected, options)
 }
 
 export function ejectResponseInterceptor(axios: AxiosInstance, id: number): void {
@@ -34,7 +27,11 @@ const validateResponseDataStructure = (data: ResponseBodyEntity) => {
 export const dataResponseInterceptor: FetchinResponseInterceptorFulfilled = (
   response: FetchinResponse<ResponseBodyEntity<any>>,
 ) => {
-  const { status, data } = response
+  const {
+    status,
+    data,
+    config: { meta },
+  } = response
 
   if (data == null || validateResponseDataStructure(data)) {
     throw new Error(
@@ -42,7 +39,7 @@ export const dataResponseInterceptor: FetchinResponseInterceptorFulfilled = (
     )
   }
 
-  response.data.message = data.message ?? localeManager.$t(status)
+  response.data.message = data.message ?? meta.localeManager.$t(status)
 
   return response
 }
@@ -60,3 +57,6 @@ export const dataResponseInterceptor: FetchinResponseInterceptorFulfilled = (
  *
  * 需要外部用户实现，此处主要是200的HttpStatus，其中判定code的业务逻辑
  */
+
+const hasOwnProperty = (context: object, prop: string) =>
+  Object.prototype.hasOwnProperty.call(context, prop)

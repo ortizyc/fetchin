@@ -46,9 +46,12 @@ importers:
 
   packages/core:
     specifiers:
+      '@ortizyc/fetchin-locale': workspace:*
       '@types/lodash.merge': ^4.6.7
       axios: ^0.27.2
       lodash.merge: ^4.6.2
+    dependencies:
+      '@ortizyc/fetchin-locale': link:../locale
     devDependencies:
       '@types/lodash.merge': 4.6.7
       axios: 0.27.2
@@ -57,10 +60,13 @@ importers:
   packages/fetchin:
     specifiers:
       '@ortizyc/fetchin-core': workspace:*
-      '@ortizyc/fetchin-locale': workspace:^0.0.1
+      '@ortizyc/fetchin-locale': workspace:*
     dependencies:
       '@ortizyc/fetchin-core': link:../core
       '@ortizyc/fetchin-locale': link:../locale
+
+  packages/locale:
+    specifiers: {}
 
 packages:
 

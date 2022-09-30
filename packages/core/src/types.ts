@@ -1,31 +1,60 @@
+import type { Locale, LocaleManager } from '@ortizyc/fetchin-locale'
 import type { AxiosInterceptorOptions, AxiosRequestConfig, AxiosResponse } from 'axios'
 
-/**
- * Fetcher configuration
- */
-export interface FetchinConfig<D = any> extends AxiosRequestConfig<D> {
+export type FetchExtraConfig = {
   /**
    * get jwt bearer token, will enable `bearerAuthInterceptor`
    */
   getBearerToken?: () => string | Promise<string>
+
   /**
    * interceptors
    */
   requestInterceptors?: FetchinInterceptor<FetchinRequestInterceptorFulfilled>[]
   responseInterceptors?: FetchinInterceptor<FetchinInterceptorRejected>[]
+
+  /**
+   * locale config
+   */
+  locales?: Locale[]
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export type FetchinMeta = {
+  localeManager: LocaleManager
+}
+
+export type FetchinMetaConfig<M = false> = M extends true
+  ? {
+      /**
+       * fetchin meta, will be injected at initialization
+       */
+      meta: FetchinMeta
+    }
+  : unknown
+
+/**
+ * Fetchin configuration
+ */
+export type FetchinConfig<D = any, M = false> = AxiosRequestConfig<D> &
+  FetchExtraConfig &
+  FetchinMetaConfig<M>
+
+/**
+ * Fetchin response
+ */
 export interface FetchinResponse<T = any, D = any> extends AxiosResponse<T, D> {
-  //
+  /**
+   * this config includes `meta` field
+   */
+  config: FetchinConfig<D, true>
 }
 
 export type FetchinRequestInterceptorFulfilled = (
-  config: FetchinConfig,
+  config: FetchinConfig<any, true>,
 ) => FetchinConfig | Promise<FetchinConfig>
 
 export type FetchinResponseInterceptorFulfilled = (
-  response: FetchinResponse,
+  response: FetchinResponse<any, true>,
 ) => FetchinResponse | Promise<FetchinResponse>
 
 export type FetchinInterceptorRejected = (error: any) => any
