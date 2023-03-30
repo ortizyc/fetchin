@@ -1,0 +1,28 @@
+{
+  "name": "@ortizyc/fetchin-locale",
+  "description": "fetchin locale",
+  "version": "0.0.1",
+  "author": "ortizyc <recuritis@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "module": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "scripts": {
+    "dev": "vite build --mode=development --watch",
+    "build": "vite build"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
