@@ -2,29 +2,40 @@ import merge from 'lodash.merge'
 import axios, { AxiosInstance } from 'axios'
 
 import { LocaleManager } from '@ortizyc/fetchin-locale'
+
 import type {
   FetchinConfig,
-  FetchinInterceptor,
   FetchinMeta,
-  FetchinRequestInterceptorFulfilled,
+  FetchinRequestInterceptor,
   FetchinResponse,
-  FetchinResponseInterceptorFulfilled,
+  FetchinResponseInterceptor,
 } from './types'
-import { responseTransformers } from './transformer/response'
-import { requestTransformers } from './transformer/request'
-import { bearerAuthInterceptor, useRequestInterceptor } from './interceptor/request'
-import { dataResponseInterceptor, useResponseInterceptor } from './interceptor/response'
+import { responseTransformers, requestTransformers } from './transformer'
+import {
+  bearerAuthInterceptor,
+  ejectRequestInterceptor,
+  useRequestInterceptor,
+  dataResponseInterceptor,
+  ejectResponseInterceptor,
+  useResponseInterceptor,
+} from './interceptor'
 
 const DEFAULT_CONFIG: FetchinConfig = {
   transformRequest: requestTransformers,
   transformResponse: responseTransformers,
-  requestInterceptors: [{ onFulfilled: bearerAuthInterceptor }],
-  responseInterceptors: [{ onFulfilled: dataResponseInterceptor }],
+  requestInterceptors: [bearerAuthInterceptor],
+  responseInterceptors: [dataResponseInterceptor],
 }
 
 export class Fetchin {
   private localeManager: LocaleManager
-  private axiosInstance!: AxiosInstance
+
+  private _inst!: AxiosInstance
+
+  get inst(): AxiosInstance {
+    return this._inst
+  }
+
   private config: FetchinConfig<any, true>
 
   constructor(config: FetchinConfig = {}) {
@@ -33,6 +44,7 @@ export class Fetchin {
     const meta: FetchinMeta = {
       localeManager: this.localeManager,
     }
+
     // merge config and inject meta
     this.config = merge({}, DEFAULT_CONFIG, config, { meta }) as FetchinConfig<any, true>
 
@@ -40,20 +52,14 @@ export class Fetchin {
   }
 
   private createInstance() {
-    this.axiosInstance = axios.create(this.config)
+    this._inst = axios.create(this.config)
 
     // bind interceptors
     const { requestInterceptors, responseInterceptors } = this.config
-    if (requestInterceptors) {
-      requestInterceptors.forEach(({ onFulfilled, onRejected, options }) => {
-        useRequestInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
-      })
-    }
-    if (responseInterceptors) {
-      responseInterceptors.forEach(({ onFulfilled, onRejected, options }) => {
-        useResponseInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
-      })
-    }
+    if (requestInterceptors)
+      requestInterceptors.forEach((interceptor) => this.addRequestInterceptor(interceptor))
+    if (responseInterceptors)
+      responseInterceptors.forEach((interceptor) => this.addResponseInterceptor(interceptor))
   }
 
   /**
@@ -63,7 +69,7 @@ export class Fetchin {
     url: string,
     config?: FetchinConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.get(url, config)
+    return this._inst.get(url, config)
   }
 
   /**
@@ -74,7 +80,7 @@ export class Fetchin {
     data?: D,
     config?: FetchinConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.post(url, data, config)
+    return this._inst.post(url, data, config)
   }
 
   /**
@@ -85,7 +91,7 @@ export class Fetchin {
     data?: D,
     config?: FetchinConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.put(url, data, config)
+    return this._inst.put(url, data, config)
   }
 
   /**
@@ -95,7 +101,7 @@ export class Fetchin {
     url: string,
     config?: FetchinConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.delete(url, config)
+    return this._inst.delete(url, config)
   }
 
   /**
@@ -106,7 +112,7 @@ export class Fetchin {
     data?: D,
     config?: FetchinConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.postForm(url, data, config)
+    return this._inst.postForm(url, data, config)
   }
 
   /**
@@ -117,33 +123,49 @@ export class Fetchin {
     data?: D,
     config?: FetchinConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.putForm(url, data, config)
+    return this._inst.putForm(url, data, config)
   }
 
   request<T = any, R = FetchinResponse<T>, D = any>(config: FetchinConfig<D>): Promise<R> {
-    return this.axiosInstance.request(config)
+    return this._inst.request(config)
   }
 
   /**
    * get full request uri
    */
   getUri(config?: FetchinConfig): string {
-    return this.axiosInstance.getUri(config)
+    return this._inst.getUri(config)
   }
 
   /**
    * add request interceptor
    */
-  useRequestInterceptor(interceptor: FetchinInterceptor<FetchinRequestInterceptorFulfilled>) {
-    const { onFulfilled, onRejected, options } = interceptor
-    return useRequestInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
+  addRequestInterceptor(interceptor: FetchinRequestInterceptor) {
+    return useRequestInterceptor(this._inst, interceptor)
   }
 
   /**
    * add response interceptor
    */
-  useResponseInterceptor(interceptor: FetchinInterceptor<FetchinResponseInterceptorFulfilled>) {
-    const { onFulfilled, onRejected, options } = interceptor
-    return useResponseInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
+  addResponseInterceptor(interceptor: FetchinResponseInterceptor) {
+    return useResponseInterceptor(this._inst, interceptor)
   }
+
+  /**
+   * remove request interceptor
+   */
+  removeRequestInterceptor(id: number) {
+    ejectRequestInterceptor(this._inst, id)
+  }
+
+  /**
+   * remove response interceptor
+   */
+  removeResponseInterceptor(id: number) {
+    ejectResponseInterceptor(this._inst, id)
+  }
+}
+
+export function createFetchin(config?: FetchinConfig) {
+  return new Fetchin(config)
 }

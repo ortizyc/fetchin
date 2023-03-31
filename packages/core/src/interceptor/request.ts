@@ -1,30 +1,31 @@
 import type { AxiosInstance } from 'axios'
-import type {
-  FetchinInterceptorOptions,
-  FetchinInterceptorRejected,
-  FetchinRequestInterceptorFulfilled,
-} from '../types'
+
+import type { FetchinRequestInterceptor } from '../types'
 
 export function useRequestInterceptor(
   axios: AxiosInstance,
-  onFulfilled?: FetchinRequestInterceptorFulfilled,
-  onRejected?: FetchinInterceptorRejected,
-  options?: FetchinInterceptorOptions,
+  interceptor: FetchinRequestInterceptor,
 ): number {
-  return axios.interceptors.request.use(onFulfilled as any, onRejected, options)
+  return axios.interceptors.request.use(
+    interceptor.onFulfilled as any,
+    interceptor.onRejected,
+    interceptor.options,
+  )
 }
 
 export function ejectRequestInterceptor(axios: AxiosInstance, id: number): void {
   axios.interceptors.request.eject(id)
 }
 
-export const bearerAuthInterceptor: FetchinRequestInterceptorFulfilled = async (config) => {
-  if (config.getBearerToken) {
-    const token = await config.getBearerToken()
-    if (token) {
-      !config.headers && (config.headers = {})
-      config.headers.Authorization = `Bearer ${token}`
+export const bearerAuthInterceptor: FetchinRequestInterceptor = {
+  onFulfilled: async (config) => {
+    if (config.getBearerToken) {
+      const token = await config.getBearerToken()
+      if (token) {
+        !config.headers && (config.headers = {})
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
-  }
-  return config
+    return config
+  },
 }

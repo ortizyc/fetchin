@@ -17,5 +17,7 @@
       "path": "packages/locale"
     }
   ],
-  "settings": {}
+  "settings": {
+    "cSpell.words": ["fetcin"]
+  }
 }
