@@ -1,47 +1,50 @@
 import type { AxiosInstance } from 'axios'
+
 import type {
-  FetchinInterceptorOptions,
-  FetchinInterceptorRejected,
   FetchinResponse,
-  FetchinResponseInterceptorFulfilled,
-  ResponseBodyEntity,
+  FetchinResponseInterceptor,
+  FetchinResponseBodyEntity,
 } from '../types'
+import { createErrorMessage } from '../utils'
 
 export function useResponseInterceptor(
   axios: AxiosInstance,
-  onFulfilled?: FetchinResponseInterceptorFulfilled,
-  onRejected?: FetchinInterceptorRejected,
-  options?: FetchinInterceptorOptions,
+  interceptor: FetchinResponseInterceptor,
 ): number {
-  return axios.interceptors.response.use(onFulfilled as any, onRejected, options)
+  return axios.interceptors.response.use(
+    interceptor.onFulfilled as any,
+    interceptor.onRejected,
+    interceptor.options,
+  )
 }
 
 export function ejectResponseInterceptor(axios: AxiosInstance, id: number): void {
   axios.interceptors.response.eject(id)
 }
 
-const validateResponseDataStructure = (data: ResponseBodyEntity) => {
-  return ['code', 'message', 'data'].every((i) => hasOwnProperty(data, i))
-}
-
-export const dataResponseInterceptor: FetchinResponseInterceptorFulfilled = (
-  response: FetchinResponse<ResponseBodyEntity<any>>,
-) => {
-  const {
-    status,
-    data,
-    config: { meta },
-  } = response
-
-  if (data == null || !validateResponseDataStructure(data)) {
+const verifyResponseDataStructure = (data: FetchinResponseBodyEntity) => {
+  const missing = ['code', 'message', 'data'].filter((i) => !hasOwnProperty(data, i))
+  if (missing.length) {
     throw new Error(
-      '[Fetchin dataResponseInterceptor Error]: Unavailable data type, please check the response body structure and transform data',
+      createErrorMessage(`Unavailable response body data, missing fields: ${missing.join(', ')}`),
     )
   }
+}
 
-  // if message is '' or null, use default message
-  response.data.message = data.message || meta.localeManager.$t(status.toString())
-  return response
+export const dataResponseInterceptor: FetchinResponseInterceptor = {
+  onFulfilled: (response: FetchinResponse<FetchinResponseBodyEntity<any>>) => {
+    const {
+      status,
+      data,
+      config: { meta },
+    } = response
+
+    verifyResponseDataStructure(data)
+
+    // if message is '' or null, use default message
+    response.data.message = data.message || meta.localeManager.$t(status.toString())
+    return response
+  },
 }
 
 /**
