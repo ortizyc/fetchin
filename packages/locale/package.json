@@ -1,8 +1,11 @@
 {
-  "name": "@ortizyc/fetchin-locale",
+  "name": "@ortizyc-fetchin/locale",
   "description": "fetchin locale",
   "version": "0.0.1",
   "author": "ortizyc <recuritis@gmail.com>",
+  "maintainers": [
+    "Cphayim <i@cphayim.me>"
+  ],
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",

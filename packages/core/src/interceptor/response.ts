@@ -1,4 +1,4 @@
-import type { FetchinResponse, FetchinResponseInterceptor, FetchinResponseBody } from '../types'
+import type { FetchinResponse, FetchinResponseBody, FetchinResponseInterceptor } from '../types'
 import { createErrorMessage, hasOwnProperty, logger } from '../utils'
 
 const VERIFY_RESPONSE_BODY_META_KEY = Symbol('verifyResponseBodyInterceptor')

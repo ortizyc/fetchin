@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import type { BuildOptions, UserConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 
-export const EXTERNAL_REPO_PKG = /^@ortizyc\/fetchin(.*)/
+export const EXTERNAL_REPO_PKG = /^@ortizyc-fetchin\/(.*)/
 
 export type CreateOptions = {
   mode: string

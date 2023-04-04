@@ -1,12 +1,12 @@
 name: Fetchin build CI
 
-on: 
+on:
   push:
     branches:
       - main
       - develop
 
-  pull_request: 
+  pull_request:
     branches:
       - main
       - develop
@@ -21,17 +21,17 @@ jobs:
       - uses: pnpm/action-setup@v2.0.1
         with:
           version: 7.6.0
-      
+
       - uses: actions/setup-node@v2
         with:
           node-version: 16
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install
 
       - name: Run ESLint
         run: pnpm lint
-      
+
       - name: Run compile and build packages
         run: pnpm build

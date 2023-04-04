@@ -1,9 +1,9 @@
 import type { AxiosRequestConfig } from 'axios'
 
-import type { Locale, LocaleManager } from '@ortizyc/fetchin-locale'
+import type { Locale, LocaleManager } from '@ortizyc-fetchin/locale'
 
-import type { FetchinRequestTransformer, FetchinResponseTransformer } from './transformer'
 import type { FetchinRequestInterceptor, FetchinResponseInterceptor } from './interceptor'
+import type { FetchinRequestTransformer, FetchinResponseTransformer } from './transformer'
 
 export interface FetchBaseConfig {
   /**

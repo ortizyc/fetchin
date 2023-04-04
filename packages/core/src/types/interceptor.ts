@@ -1,4 +1,5 @@
 import type { AxiosInterceptorOptions } from 'axios'
+
 import type { FetchinConfig, FetchinResponse } from '../types'
 
 /**

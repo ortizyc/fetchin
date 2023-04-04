@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest'
-import { LocaleManager } from '../src/manager'
+import { describe, expect, it, vi } from 'vitest'
+
 import { en_US, zh_CN, zh_TW } from '../src/locales'
+import { LocaleManager } from '../src/manager'
 
 describe('LocaleManager', () => {
   it('should be able initialize locale manager', () => {

@@ -1,11 +1,11 @@
-import './style.css'
-
 import {
   Fetchin,
+  FetchinResponseBody,
   createMatchResponseBodyCodeInterceptor,
   createRequestTransformer,
-  FetchinResponseBody,
-} from '@ortizyc/fetchin'
+} from '@ortizyc-fetchin/core'
+
+import './style.css'
 
 const matchRules = {
   200: () => true,
