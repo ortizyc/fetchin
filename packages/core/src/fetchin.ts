@@ -1,31 +1,17 @@
-import merge from 'lodash.merge'
-import axios, { AxiosInstance } from 'axios'
+import axios, { type AxiosInstance } from 'axios'
 
 import { LocaleManager } from '@ortizyc/fetchin-locale'
 
 import type {
   FetchinConfig,
   FetchinMeta,
+  FetchinRequestConfig,
   FetchinRequestInterceptor,
   FetchinResponse,
   FetchinResponseInterceptor,
 } from './types'
-import { responseTransformers, requestTransformers } from './transformer'
-import {
-  bearerAuthInterceptor,
-  ejectRequestInterceptor,
-  useRequestInterceptor,
-  dataResponseInterceptor,
-  ejectResponseInterceptor,
-  useResponseInterceptor,
-} from './interceptor'
 
-const DEFAULT_CONFIG: FetchinConfig = {
-  transformRequest: requestTransformers,
-  transformResponse: responseTransformers,
-  requestInterceptors: [bearerAuthInterceptor],
-  responseInterceptors: [dataResponseInterceptor],
-}
+import { serializeConfig } from './config'
 
 export class Fetchin {
   private localeManager: LocaleManager
@@ -46,7 +32,7 @@ export class Fetchin {
     }
 
     // merge config and inject meta
-    this.config = merge({}, DEFAULT_CONFIG, config, { meta }) as FetchinConfig<any, true>
+    this.config = { ...serializeConfig(config), ...{ meta } }
 
     this.createInstance()
   }
@@ -67,7 +53,7 @@ export class Fetchin {
    */
   get<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
     return this._inst.get(url, config)
   }
@@ -78,7 +64,7 @@ export class Fetchin {
   post<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
     return this._inst.post(url, data, config)
   }
@@ -89,9 +75,20 @@ export class Fetchin {
   put<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
     return this._inst.put(url, data, config)
+  }
+
+  /**
+   * patch request
+   */
+  patch<T = any, R = FetchinResponse<T>, D = any>(
+    url: string,
+    data?: D,
+    config?: FetchinRequestConfig<D>,
+  ): Promise<R> {
+    return this._inst.patch(url, data, config)
   }
 
   /**
@@ -99,7 +96,7 @@ export class Fetchin {
    */
   delete<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
     return this._inst.delete(url, config)
   }
@@ -110,7 +107,7 @@ export class Fetchin {
   postForm<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
     return this._inst.postForm(url, data, config)
   }
@@ -121,12 +118,23 @@ export class Fetchin {
   putForm<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
     return this._inst.putForm(url, data, config)
   }
 
-  request<T = any, R = FetchinResponse<T>, D = any>(config: FetchinConfig<D>): Promise<R> {
+  /**
+   * patch form request
+   */
+  patchForm<T = any, R = FetchinResponse<T>, D = any>(
+    url: string,
+    data?: D,
+    config?: FetchinRequestConfig<D>,
+  ): Promise<R> {
+    return this._inst.patchForm(url, data, config)
+  }
+
+  request<T = any, R = FetchinResponse<T>, D = any>(config: FetchinRequestConfig<D>): Promise<R> {
     return this._inst.request(config)
   }
 
@@ -141,28 +149,36 @@ export class Fetchin {
    * add request interceptor
    */
   addRequestInterceptor(interceptor: FetchinRequestInterceptor) {
-    return useRequestInterceptor(this._inst, interceptor)
+    return this._inst.interceptors.request.use(
+      interceptor.onFulfilled as any,
+      interceptor.onRejected,
+      interceptor.options,
+    )
   }
 
   /**
    * add response interceptor
    */
   addResponseInterceptor(interceptor: FetchinResponseInterceptor) {
-    return useResponseInterceptor(this._inst, interceptor)
+    return this._inst.interceptors.response.use(
+      interceptor.onFulfilled as any,
+      interceptor.onRejected,
+      interceptor.options,
+    )
   }
 
   /**
    * remove request interceptor
    */
   removeRequestInterceptor(id: number) {
-    ejectRequestInterceptor(this._inst, id)
+    this._inst.interceptors.request.eject(id)
   }
 
   /**
    * remove response interceptor
    */
   removeResponseInterceptor(id: number) {
-    ejectResponseInterceptor(this._inst, id)
+    this._inst.interceptors.response.eject(id)
   }
 }
 

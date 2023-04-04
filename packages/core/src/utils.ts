@@ -19,3 +19,7 @@ export function createThrowErrorFunction(message: string) {
     throw new Error(createErrorMessage(message))
   }
 }
+
+export function hasOwnProperty(context: object, prop: string) {
+  return Object.prototype.hasOwnProperty.call(context, prop)
+}

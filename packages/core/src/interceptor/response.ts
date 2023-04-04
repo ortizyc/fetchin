@@ -1,65 +1,105 @@
-import type { AxiosInstance } from 'axios'
+import type { FetchinResponse, FetchinResponseInterceptor, FetchinResponseBody } from '../types'
+import { createErrorMessage, hasOwnProperty, logger } from '../utils'
 
-import type {
-  FetchinResponse,
-  FetchinResponseInterceptor,
-  FetchinResponseBodyEntity,
-} from '../types'
-import { createErrorMessage } from '../utils'
+const VERIFY_RESPONSE_BODY_META_KEY = Symbol('verifyResponseBodyInterceptor')
 
-export function useResponseInterceptor(
-  axios: AxiosInstance,
-  interceptor: FetchinResponseInterceptor,
-): number {
-  return axios.interceptors.response.use(
-    interceptor.onFulfilled as any,
-    interceptor.onRejected,
-    interceptor.options,
-  )
-}
-
-export function ejectResponseInterceptor(axios: AxiosInstance, id: number): void {
-  axios.interceptors.response.eject(id)
-}
-
-const verifyResponseDataStructure = (data: FetchinResponseBodyEntity) => {
-  const missing = ['code', 'message', 'data'].filter((i) => !hasOwnProperty(data, i))
+const verifyResponseBodyStructure = (data: FetchinResponseBody) => {
+  const required: (keyof FetchinResponseBody)[] = ['code', 'message', 'data']
+  const missing = required.filter((i) => !hasOwnProperty(data, i))
   if (missing.length) {
-    throw new Error(
-      createErrorMessage(`Unavailable response body data, missing fields: ${missing.join(', ')}`),
+    logger.warn(`Unavailable response body data:`, data)
+    logger.warn(`Missing properties:`, missing)
+    logger.warn(
+      `Please check the response data structure, if it is not json response, please set correct 'config.responseType'`,
     )
+    throw new Error(createErrorMessage(`verifyResponseDataStructure: verify failed`))
   }
 }
 
-export const dataResponseInterceptor: FetchinResponseInterceptor = {
-  onFulfilled: (response: FetchinResponse<FetchinResponseBodyEntity<any>>) => {
-    const {
-      status,
-      data,
-      config: { meta },
-    } = response
+export const verifyResponseBodyInterceptor: FetchinResponseInterceptor = {
+  onFulfilled: (response: FetchinResponse<FetchinResponseBody<any>>) => {
+    const { status, data, config } = response
 
-    verifyResponseDataStructure(data)
+    // if responseType is not json, skip this interceptor
+    if (config.responseType === 'json') {
+      verifyResponseBodyStructure(data)
+      // if message is '' or null, use default message
+      response.data.message ||= config.meta.localeManager.$t(status.toString())
+    }
 
-    // if message is '' or null, use default message
-    response.data.message = data.message || meta.localeManager.$t(status.toString())
+    // passed flag
+    response[VERIFY_RESPONSE_BODY_META_KEY] = true
     return response
   },
 }
 
-/**
- * error handling
- *
- * FetchinError
- *    处理一些公共情况的异常，这里主要是400及以上的HttpStatus, 比如404
- *    此处可以使用locale内的消息提示定义
- */
+export type MatchResponseBodyCodeHandler =
+  | boolean
+  | ((response: FetchinResponse<FetchinResponseBody<any>>) => boolean | Promise<boolean>)
 
-/**
- * Business code handling
- *
- * 需要外部用户实现，此处主要是200的HttpStatus，其中判定code的业务逻辑
- */
+export type MatchResponseBodyCodeRules = Record<
+  FetchinResponseBody['code'],
+  MatchResponseBodyCodeHandler
+>
 
-const hasOwnProperty = (context: object, prop: string) =>
-  Object.prototype.hasOwnProperty.call(context, prop)
+export type MatchResponseBodyCodeInterceptorOptions = {
+  /**
+   * Match rules
+   */
+  matchRules: MatchResponseBodyCodeRules
+  /**
+   * Skip unmatched response
+   * - `true`: skip unmatched response code
+   * - `false`: throw error when unmatched response code
+   * @default false
+   */
+  skipUnmatched?: boolean
+}
+
+const MISSING_VERIFY_RESPONSE_ERROR_MESSAGE =
+  'matchResponseBodyCodeInterceptor: verifyResponseBodyInterceptor should be used before'
+const UNMATCHED_RESPONSE_ERROR_MESSAGE = (code: string | number) =>
+  `matchResponseBodyCodeInterceptor: Unmatched response code -> ${code}`
+const BLOCKED_RESPONSE_ERROR_MESSAGE = (code: string | number) =>
+  `matchResponseBodyCodeInterceptor: Blocked response code: ${code}`
+
+export const createMatchResponseBodyCodeInterceptor = ({
+  matchRules,
+  skipUnmatched = false,
+}: MatchResponseBodyCodeInterceptorOptions): FetchinResponseInterceptor => {
+  return {
+    onFulfilled: async (response) => {
+      const { data, config } = response
+
+      // if responseType is not json, skip this interceptor
+      if (config.responseType !== 'json') return response
+
+      // required verifyResponseBodyInterceptor to be used before
+      if (!response[VERIFY_RESPONSE_BODY_META_KEY]) {
+        throw new Error(createErrorMessage(MISSING_VERIFY_RESPONSE_ERROR_MESSAGE))
+      }
+
+      const matchHandler = matchRules[data.code]
+
+      if (typeof matchHandler === 'undefined') {
+        if (skipUnmatched) return response
+        throw new Error(createErrorMessage(UNMATCHED_RESPONSE_ERROR_MESSAGE(data.code)))
+      }
+
+      let matchResult = false
+
+      if (typeof matchHandler === 'function') {
+        try {
+          matchResult = await matchHandler(response)
+        } catch (error) {
+          logger.error(error)
+        }
+      }
+      if (!matchResult) {
+        throw new Error(createErrorMessage(BLOCKED_RESPONSE_ERROR_MESSAGE(data.code)))
+      }
+
+      return response
+    },
+  }
+}
