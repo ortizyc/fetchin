@@ -1,7 +1,8 @@
 import axios, { type AxiosInstance } from 'axios'
 
-import { LocaleManager } from '@ortizyc/fetchin-locale'
+import { LocaleManager } from '@ortizyc-fetchin/locale'
 
+import { serializeConfig } from './config'
 import type {
   FetchinConfig,
   FetchinMeta,
@@ -10,8 +11,6 @@ import type {
   FetchinResponse,
   FetchinResponseInterceptor,
 } from './types'
-
-import { serializeConfig } from './config'
 
 export class Fetchin {
   private localeManager: LocaleManager

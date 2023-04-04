@@ -3,9 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@ortizyc/fetchin-core": ["packages/core/src"],
-      "@ortizyc/fetchin-locale": ["packages/locale/src"],
-      "@ortizyc/fetchin": ["packages/fetchin/src"]
+      "@ortizyc-fetchin/core": ["packages/core/src"],
+      "@ortizyc-fetchin/locale": ["packages/locale/src"]
     }
   },
   "include": ["packages/*/src", "playgrounds/*/src"]

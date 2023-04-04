@@ -1,8 +1,11 @@
 {
-  "name": "@ortizyc/fetchin-core",
+  "name": "@ortizyc-fetchin/core",
   "description": "fetchin core",
   "version": "0.0.1",
   "author": "ortizyc <recuritis@gmail.com>",
+  "maintainers": [
+    "Cphayim <i@cphayim.me>"
+  ],
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
@@ -22,7 +25,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@ortizyc/fetchin-locale": "workspace:*"
+    "@ortizyc-fetchin/locale": "workspace:*"
   },
   "devDependencies": {
     "axios": "^0.27.2"
