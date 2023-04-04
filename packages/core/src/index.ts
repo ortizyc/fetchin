@@ -1,5 +1,5 @@
 export * from './types'
 
-export * from './Fetchin'
+export * from './fetchin'
 export * from './transformer'
 export * from './interceptor'
