@@ -11,7 +11,7 @@ The starter is built on top of Vite 2.x and prepared for writing libraries in Ty
 - Stylelint - styles linter
 - Prettier - formatter
 - Jest - test framework
-- Husky + lint-staged - pre-commit git hook set up for formatting
+- Husky + lint-staged - pre-commit git hook set up for formattin
 
 ## GitHub Template
 
