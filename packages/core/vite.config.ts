@@ -1,28 +1,15 @@
-import { resolve } from 'path'
-import { defineConfig } from 'vite'
-import dts from 'vite-plugin-dts'
+import { UserConfigExport, defineConfig } from 'vite'
+
+import { addDTSPlugin, createBuild } from '../../scripts/vite.base.config'
 
 export default defineConfig(({ mode }) => {
-  return {
-    build: {
-      outDir: resolve(__dirname, 'dist'),
-      sourcemap: false,
-      lib: {
-        entry: resolve(__dirname, 'src/index.ts'),
-        formats: ['es', 'cjs'],
-        fileName: (format) => `index${format === 'es' ? '.js' : '.cjs'}`,
-      },
-      rollupOptions: {
-        external: ['@ortizyc/fetchin-locale'],
-      },
-    },
-    plugins: [
-      dts({
-        rollupTypes: mode === 'production',
-        insertTypesEntry: true,
-        copyDtsFiles: false,
-        beforeWriteFile: (filePath, content) => ({ filePath, content }),
-      }),
-    ],
+  const config: UserConfigExport = {
+    build: createBuild({ mode, root: __dirname }),
+    plugins: [],
   }
+
+  // generate dts file
+  addDTSPlugin(config, { mode, root: __dirname })
+
+  return config
 })

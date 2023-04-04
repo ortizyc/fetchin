@@ -1,30 +1,27 @@
-import merge from 'lodash.merge'
-import axios, { AxiosInstance } from 'axios'
+import axios, { type AxiosInstance } from 'axios'
 
 import { LocaleManager } from '@ortizyc/fetchin-locale'
+
 import type {
   FetchinConfig,
-  FetchinInterceptor,
   FetchinMeta,
-  FetchinRequestInterceptorFulfilled,
+  FetchinRequestConfig,
+  FetchinRequestInterceptor,
   FetchinResponse,
-  FetchinResponseInterceptorFulfilled,
+  FetchinResponseInterceptor,
 } from './types'
-import { responseTransformers } from './transformer/response'
-import { requestTransformers } from './transformer/request'
-import { bearerAuthInterceptor, useRequestInterceptor } from './interceptor/request'
-import { dataResponseInterceptor, useResponseInterceptor } from './interceptor/response'
 
-const DEFAULT_CONFIG: FetchinConfig = {
-  transformRequest: requestTransformers,
-  transformResponse: responseTransformers,
-  requestInterceptors: [{ onFulfilled: bearerAuthInterceptor }],
-  responseInterceptors: [{ onFulfilled: dataResponseInterceptor }],
-}
+import { serializeConfig } from './config'
 
 export class Fetchin {
   private localeManager: LocaleManager
-  private axiosInstance!: AxiosInstance
+
+  private _inst!: AxiosInstance
+
+  get inst(): AxiosInstance {
+    return this._inst
+  }
+
   private config: FetchinConfig<any, true>
 
   constructor(config: FetchinConfig = {}) {
@@ -33,27 +30,22 @@ export class Fetchin {
     const meta: FetchinMeta = {
       localeManager: this.localeManager,
     }
+
     // merge config and inject meta
-    this.config = merge({}, DEFAULT_CONFIG, config, { meta }) as FetchinConfig<any, true>
+    this.config = { ...serializeConfig(config), ...{ meta } }
 
     this.createInstance()
   }
 
   private createInstance() {
-    this.axiosInstance = axios.create(this.config)
+    this._inst = axios.create(this.config)
 
     // bind interceptors
     const { requestInterceptors, responseInterceptors } = this.config
-    if (requestInterceptors) {
-      requestInterceptors.forEach(({ onFulfilled, onRejected, options }) => {
-        useRequestInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
-      })
-    }
-    if (responseInterceptors) {
-      responseInterceptors.forEach(({ onFulfilled, onRejected, options }) => {
-        useResponseInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
-      })
-    }
+    if (requestInterceptors)
+      requestInterceptors.forEach((interceptor) => this.addRequestInterceptor(interceptor))
+    if (responseInterceptors)
+      responseInterceptors.forEach((interceptor) => this.addResponseInterceptor(interceptor))
   }
 
   /**
@@ -61,9 +53,9 @@ export class Fetchin {
    */
   get<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.get(url, config)
+    return this._inst.get(url, config)
   }
 
   /**
@@ -72,9 +64,9 @@ export class Fetchin {
   post<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.post(url, data, config)
+    return this._inst.post(url, data, config)
   }
 
   /**
@@ -83,9 +75,20 @@ export class Fetchin {
   put<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.put(url, data, config)
+    return this._inst.put(url, data, config)
+  }
+
+  /**
+   * patch request
+   */
+  patch<T = any, R = FetchinResponse<T>, D = any>(
+    url: string,
+    data?: D,
+    config?: FetchinRequestConfig<D>,
+  ): Promise<R> {
+    return this._inst.patch(url, data, config)
   }
 
   /**
@@ -93,9 +96,9 @@ export class Fetchin {
    */
   delete<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.delete(url, config)
+    return this._inst.delete(url, config)
   }
 
   /**
@@ -104,9 +107,9 @@ export class Fetchin {
   postForm<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.postForm(url, data, config)
+    return this._inst.postForm(url, data, config)
   }
 
   /**
@@ -115,35 +118,70 @@ export class Fetchin {
   putForm<T = any, R = FetchinResponse<T>, D = any>(
     url: string,
     data?: D,
-    config?: FetchinConfig<D>,
+    config?: FetchinRequestConfig<D>,
   ): Promise<R> {
-    return this.axiosInstance.putForm(url, data, config)
+    return this._inst.putForm(url, data, config)
   }
 
-  request<T = any, R = FetchinResponse<T>, D = any>(config: FetchinConfig<D>): Promise<R> {
-    return this.axiosInstance.request(config)
+  /**
+   * patch form request
+   */
+  patchForm<T = any, R = FetchinResponse<T>, D = any>(
+    url: string,
+    data?: D,
+    config?: FetchinRequestConfig<D>,
+  ): Promise<R> {
+    return this._inst.patchForm(url, data, config)
+  }
+
+  request<T = any, R = FetchinResponse<T>, D = any>(config: FetchinRequestConfig<D>): Promise<R> {
+    return this._inst.request(config)
   }
 
   /**
    * get full request uri
    */
   getUri(config?: FetchinConfig): string {
-    return this.axiosInstance.getUri(config)
+    return this._inst.getUri(config)
   }
 
   /**
    * add request interceptor
    */
-  useRequestInterceptor(interceptor: FetchinInterceptor<FetchinRequestInterceptorFulfilled>) {
-    const { onFulfilled, onRejected, options } = interceptor
-    return useRequestInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
+  addRequestInterceptor(interceptor: FetchinRequestInterceptor) {
+    return this._inst.interceptors.request.use(
+      interceptor.onFulfilled as any,
+      interceptor.onRejected,
+      interceptor.options,
+    )
   }
 
   /**
    * add response interceptor
    */
-  useResponseInterceptor(interceptor: FetchinInterceptor<FetchinResponseInterceptorFulfilled>) {
-    const { onFulfilled, onRejected, options } = interceptor
-    return useResponseInterceptor(this.axiosInstance, onFulfilled, onRejected, options)
+  addResponseInterceptor(interceptor: FetchinResponseInterceptor) {
+    return this._inst.interceptors.response.use(
+      interceptor.onFulfilled as any,
+      interceptor.onRejected,
+      interceptor.options,
+    )
   }
+
+  /**
+   * remove request interceptor
+   */
+  removeRequestInterceptor(id: number) {
+    this._inst.interceptors.request.eject(id)
+  }
+
+  /**
+   * remove response interceptor
+   */
+  removeResponseInterceptor(id: number) {
+    this._inst.interceptors.response.eject(id)
+  }
+}
+
+export function createFetchin(config?: FetchinConfig) {
+  return new Fetchin(config)
 }

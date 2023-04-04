@@ -1,30 +1,32 @@
-import type { AxiosInstance } from 'axios'
-import type {
-  FetchinInterceptorOptions,
-  FetchinInterceptorRejected,
-  FetchinRequestInterceptorFulfilled,
-} from '../types'
+import type { FetchinRequestInterceptor } from '../types/interceptor'
 
-export function useRequestInterceptor(
-  axios: AxiosInstance,
-  onFulfilled?: FetchinRequestInterceptorFulfilled,
-  onRejected?: FetchinInterceptorRejected,
-  options?: FetchinInterceptorOptions,
-): number {
-  return axios.interceptors.request.use(onFulfilled as any, onRejected, options)
+export type BearerAuthRequestInterceptorOptions = {
+  /**
+   * A function that returns the bearer token.
+   */
+  getBearerToken?: () => string | Promise<string>
+  /**
+   * The header key of the bearer token.
+   * @default 'Authorization'
+   */
+  headerKey?: string
 }
 
-export function ejectRequestInterceptor(axios: AxiosInstance, id: number): void {
-  axios.interceptors.request.eject(id)
-}
+export const createBearerAuthRequestInterceptor = ({
+  getBearerToken,
+  headerKey = 'Authorization',
+}: BearerAuthRequestInterceptorOptions = {}): FetchinRequestInterceptor => {
+  return {
+    onFulfilled: async (config) => {
+      // if not passed `getBearerToken`, skip this interceptor
+      if (!getBearerToken) return config
 
-export const bearerAuthInterceptor: FetchinRequestInterceptorFulfilled = async (config) => {
-  if (config.getBearerToken) {
-    const token = await config.getBearerToken()
-    if (token) {
-      !config.headers && (config.headers = {})
-      config.headers.Authorization = `Bearer ${token}`
-    }
+      const token = await getBearerToken()
+      if (token) {
+        !config.headers && (config.headers = {})
+        config.headers[headerKey] = `Bearer ${token}`
+      }
+      return config
+    },
   }
-  return config
 }

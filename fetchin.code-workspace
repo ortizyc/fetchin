@@ -9,13 +9,15 @@
       "path": "packages/core"
     },
     {
-      "name": "📦 @ortizyc/fetchin",
-      "path": "packages/fetchin"
-    },
-    {
       "name": "📦 @ortizyc/fetchin-locale",
       "path": "packages/locale"
+    },
+    {
+      "name": "📦 @ortizyc/fetchin",
+      "path": "packages/fetchin"
     }
   ],
-  "settings": {}
+  "settings": {
+    "cSpell.words": ["fetcin"]
+  }
 }
