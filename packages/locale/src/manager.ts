@@ -1,5 +1,5 @@
-import type { Locale } from './types'
 import { en_US } from './locales'
+import type { Locale } from './types'
 
 const DEFAULT_LOCALE = en_US
 
