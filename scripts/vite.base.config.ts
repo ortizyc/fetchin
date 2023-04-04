@@ -36,7 +36,7 @@ export const createDTSPlugin = ({
   mode,
   root,
   skipDiagnostics,
-  rollupTypes = true,
+  rollupTypes = false,
 }: CreateDTSPluginOptions) => {
   return dts({
     skipDiagnostics,
