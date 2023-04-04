@@ -3,7 +3,7 @@ import './style.css'
 import {
   Fetchin,
   createMatchResponseBodyCodeInterceptor,
-  createResponseTransformer,
+  createRequestTransformer,
   FetchinResponseBody,
 } from '@ortizyc/fetchin'
 
@@ -57,7 +57,7 @@ const nonstandardFetchin = new Fetchin({
   baseURL: 'http://localhost:9999',
   // 这里使用 createResponseTransformer 创建一个包装转换器，它将额外传入 config 参数
   responseTransformers: [
-    createResponseTransformer((data, headers, config) => {
+    createRequestTransformer((data, headers, config) => {
       if (config.responseType !== 'json') return data
       return {
         code: data.status,
