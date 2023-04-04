@@ -24,7 +24,7 @@ export type FetchinRequestExtendTransformer = (
  *
  * Use this creator, you can also obtain the `requestConfig` object
  */
-export const createResponseTransformer = (
+export const createRequestTransformer = (
   extendTransformer: FetchinRequestExtendTransformer,
 ): FetchinRequestTransformer => {
   // return a normal function that obtains `this`, which is equivalent to `config`.
