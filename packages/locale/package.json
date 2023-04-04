@@ -5,6 +5,9 @@
   "author": "ortizyc <recuritis@gmail.com>",
   "license": "MIT",
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -12,9 +15,6 @@
       "require": "./dist/index.cjs"
     }
   },
-  "module": "./dist/index.js",
-  "types": "dist/index.d.ts",
-  "main": "./dist/index.cjs",
   "scripts": {
     "dev": "vite build --mode=development --watch",
     "build": "vite build"
