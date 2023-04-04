@@ -27,11 +27,6 @@ jobs:
           node-version: 16
           cache: 'pnpm'
       
-      - name: secrets
-        env: 
-          SSECRET: ${{ secrets.SSECRET }}
-        run: echo "$env:SSECRET"
-
       - name: Install dependencies
         run: pnpm install
 

@@ -1,10 +1,12 @@
 {
-  "extends": "@ombro/ts-config/tsconfig.esm.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "composite": true,
-    "removeComments": false,
-    "types": ["vite/client", "node", "vitest"]
+    "baseUrl": ".",
+    "paths": {
+      "@ortizyc/fetchin-core": ["packages/core/src"],
+      "@ortizyc/fetchin-locale": ["packages/locale/src"],
+      "@ortizyc/fetchin": ["packages/fetchin/src"]
+    }
   },
-  "include": ["src"],
-  "exclude": ["**/*.test.ts", "node_modules", "test/**", ".history/**"]
+  "include": ["packages/*/src", "playgrounds/*/src"]
 }

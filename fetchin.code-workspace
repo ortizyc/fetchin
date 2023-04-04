@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "name": "✨ @ortizyc/fetchin-monorepo",
+      "path": "."
+    },
+    {
+      "name": "📦 @ortizyc/fetchin-core",
+      "path": "packages/core"
+    },
+    {
+      "name": "📦 @ortizyc/fetchin-locale",
+      "path": "packages/locale"
+    },
+    {
+      "name": "📦 @ortizyc/fetchin",
+      "path": "packages/fetchin"
+    }
+  ],
+  "settings": {
+    "cSpell.words": ["fetcin"]
+  }
+}
